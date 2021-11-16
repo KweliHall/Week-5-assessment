@@ -21,11 +21,11 @@ module.exports = {
                 country_id serial primary key, 
                 name varchar
             );
-            create table cc_cities (
+            create table cities (
                 city_id serial primary key,
                 name varchar(50),
                 rating integer,
-                country_id integer
+                country_id integer references countries(country_id)
             ); 
             
             insert into countries (name)
@@ -233,5 +233,28 @@ module.exports = {
         sequelize.query(`SELECT * FROM countries`)
             .then(dbRes => res.status(200).send(dbRes[0]))
             .catch(err => console.log(err))
-    }
+    },
+    createCity: (req, res) => {
+        const {name, rating, countryId} = req.body
+        
+        sequelize.query(`
+            INSERT INTO cities (name, rating, country_id)
+            VALUES ('${name}', ${rating}, ${countryId});`)
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(err => console.log(err))
+    },
+    getCities: (req, res) => {
+        sequelize.query(`
+            SELECT c.city_id, c.name AS city, c.rating, co.country_id, co.name AS country
+            FROM cities AS c
+            JOIN countries co ON cities.country_id = co.country_id
+            ;`)
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(err => console.log(err)
+        )},
+    deleteCity: (req, res) => {
+        sequelize.query(``)
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(err => console.log(err))
+    } 
 }
